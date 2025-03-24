@@ -2,18 +2,24 @@
 session_start();
 error_reporting(0);
 include('includes/config.php');
+
+// Clear any previous admin login session
 if ($_SESSION['alogin'] != '') {
     $_SESSION['alogin'] = '';
 }
+
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = md5($_POST['password']);
-    $sql = "SELECT UserName, Password FROM admin WHERE UserName = :username and Password = :password";
+
+    // Ensure the admin table exists in your PostgreSQL database with columns 'username' and 'password'
+    $sql = "SELECT username, password FROM admin WHERE username = :username AND password = :password";
     $query = $dbh->prepare($sql);
     $query->bindParam(':username', $username, PDO::PARAM_STR);
     $query->bindParam(':password', $password, PDO::PARAM_STR);
     $query->execute();
     $results = $query->fetchAll(PDO::FETCH_OBJ);
+    
     if ($query->rowCount() > 0) {
         $_SESSION['alogin'] = $_POST['username'];
         echo "<script type='text/javascript'> document.location ='admin/dashboard.php'; </script>";
@@ -24,7 +30,6 @@ if (isset($_POST['login'])) {
 ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
@@ -40,7 +45,6 @@ if (isset($_POST['login'])) {
     <!-- GOOGLE FONT -->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
 </head>
-
 <body>
     <!------MENU SECTION START-->
     <?php include('includes/header.php'); ?>
@@ -52,7 +56,6 @@ if (isset($_POST['login'])) {
                     <h4 class="header-line">ADMIN LOGIN FORM</h4>
                 </div>
             </div>
-
             <!--LOGIN PANEL START-->
             <div class="row">
                 <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
@@ -88,5 +91,4 @@ if (isset($_POST['login'])) {
     <!-- CUSTOM SCRIPTS  -->
     <script src="assets/js/custom.js"></script>
 </body>
-
 </html>
